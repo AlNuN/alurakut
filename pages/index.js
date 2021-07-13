@@ -1,6 +1,6 @@
 import MainGrid from '../src/components/MainGrid'
 import Box from '../src/components/Box'
-import { ProfileRelationsBoxWrapper } from '../src/components/ProfileRelations'
+import CommunityCard from '../src/components/CommunityCard'
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons' 
 import { useState } from 'react'
 
@@ -14,8 +14,8 @@ function ProfileSideBar(propriedades) {
         <a className="boxLink" href={`https://github.com/${propriedades.githubUser}`}>
           @{propriedades.githubUser}
         </a>
-        <hr />
       </p>
+      <hr />
 
       <AlurakutProfileSidebarMenuDefault />
     </Box>
@@ -23,19 +23,30 @@ function ProfileSideBar(propriedades) {
 }
 
 export default function Home() {
-  const [comunidades, setComunidades] = useState([{
-    id: new Date().toISOString(),
-    title: 'Eu odeio acordar cedo',
-    image: 'https://alurakut.vercel.app/capa-comunidade-01.jpg'
-  }])
+  const [comunidades, setComunidades] = useState([
+    {
+      id: new Date().toISOString(),
+      title: 'Exercism',
+      image: 'https://github.com/exercism.png',
+      link: 'https://exercism.io/'
+    },
+    {
+      id: new Date().toISOString(),
+      title: 'Dev.to',
+      image: 'https://res.cloudinary.com/practicaldev/image/fetch/s--pcSkTMZL--/c_limit,f_auto,fl_progressive,q_80,w_190/https://practicaldev-herokuapp-com.freetls.fastly.net/assets/devlogo-pwa-512.png',
+      link: 'https://dev.to/'
+    },
+
+])
   const githubUser = 'AlNuN'
   const pessoasFavoritas = [
     'JulianaAmoasei',
     'flaviohenriquealmeida',
-    'giggio',
-    'omariosouto',
     'juunegreiros',
+    'omariosouto',
+    'rafaballerini',
     'peas',
+    'giggio',
   ]
 
   const handleCreateCommunity = (event) => {
@@ -46,6 +57,7 @@ export default function Home() {
       id: new Date().toISOString(),
       title: dadosForm.get('title'),
       image: dadosForm.get('image'),
+      link: dadosForm.get('link'),
     }
 
     setComunidades([...comunidades, comunidade])
@@ -86,6 +98,14 @@ export default function Home() {
                   type="text"
                 />
               </div>
+              <div>
+                <input 
+                  name="link"
+                  placeholder="Coloque uma URL para acesso à comunidade" 
+                  aria-label="Coloque uma URL para acesso à comunidade"
+                  type="text"
+                />
+              </div>
               <button>
                 Criar comunidade
               </button>
@@ -94,36 +114,19 @@ export default function Home() {
           </Box>
         </div>
         <div className="profileRelationsArea" style={{ gridArea: 'profileRelationsArea' }}>
-          <ProfileRelationsBoxWrapper>
-            <h2>Comunidades</h2>
-            <ul>
-              {comunidades.map((itemAtual) =>
-                  <li key={itemAtual.id}>
-                    <a href={`/users/${itemAtual}`} key={itemAtual}>
-                      <img src={itemAtual.image} />
-                      <span>{itemAtual.title}</span>
-                    </a>
-                  </li>
-              )}
-            </ul>
-          </ProfileRelationsBoxWrapper>
-          <ProfileRelationsBoxWrapper>
-            <h2>
-              Pessoas da Comunidade ({pessoasFavoritas.length})
-            </h2>
-            <ul>
-              {pessoasFavoritas.map((itemAtual) => {
-                return (
-                  <li key={itemAtual}>
-                    <a href={`/users/${itemAtual}`}>
-                      <img src={`https://github.com/${itemAtual}.png`} />
-                      <span>{itemAtual}</span>
-                    </a>
-                  </li>
-                )
-              })}
-            </ul>
-          </ProfileRelationsBoxWrapper>
+          <CommunityCard 
+            title="Comunidades"
+            items={comunidades}
+            imageTemplate={(a) => a.image}
+            linkTemplate={(a) => a.link}
+          />
+
+          <CommunityCard
+            title="Pessoas da Comunidade"
+            items={pessoasFavoritas}
+            imageTemplate={(a) => `https://github.com/${a}.png`}
+            linkTemplate={(a) => `https://github.com/${a}`}
+          />
         </div>
       </MainGrid>
     </>
