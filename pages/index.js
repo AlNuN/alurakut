@@ -1,8 +1,8 @@
 import MainGrid from '../src/components/MainGrid'
 import Box from '../src/components/Box'
-import CommunityCard from '../src/components/CommunityCard'
+import { CommunityCard, ComunidadesDTO, PessoasComunidadeDTO, SeguindoDTO } from '../src/components/CommunityCard'
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons' 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 function ProfileSideBar(propriedades) {
   return (
@@ -63,6 +63,19 @@ export default function Home() {
     setComunidades([...comunidades, comunidade])
   }
 
+  const [seguidores, setSeguidores] = useState([])
+  useEffect(() => {
+    fetch(`https://api.github.com/users/${githubUser}/following`)
+      .then((response) => {
+        if(response.ok) {
+          return response.json()
+        }
+        throw new Error(`Aconteceu algo de errado: ${response.status}`)
+      })
+      .then((resp) => { setSeguidores(resp) })
+      .catch((error) => console.log(error))
+  }, [])
+
   return (
     <>
       <AlurakutMenu githubUser={githubUser}></AlurakutMenu>
@@ -115,17 +128,21 @@ export default function Home() {
         </div>
         <div className="profileRelationsArea" style={{ gridArea: 'profileRelationsArea' }}>
           <CommunityCard 
+            title="Seguindo"
+            items={seguidores}
+            type={SeguindoDTO}
+          />
+
+          <CommunityCard 
             title="Comunidades"
             items={comunidades}
-            imageTemplate={(a) => a.image}
-            linkTemplate={(a) => a.link}
+            type={ComunidadesDTO}
           />
 
           <CommunityCard
             title="Pessoas da Comunidade"
             items={pessoasFavoritas}
-            imageTemplate={(a) => `https://github.com/${a}.png`}
-            linkTemplate={(a) => `https://github.com/${a}`}
+            type={PessoasComunidadeDTO}
           />
         </div>
       </MainGrid>
