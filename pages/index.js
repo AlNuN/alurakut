@@ -24,18 +24,18 @@ function ProfileSideBar(propriedades) {
 
 export default function Home() {
   const [comunidades, setComunidades] = useState([
-    {
-      id: new Date().toISOString(),
-      title: 'Exercism',
-      image: 'https://github.com/exercism.png',
-      link: 'https://exercism.io/'
-    },
-    {
-      id: new Date().toISOString(),
-      title: 'Dev.to',
-      image: 'https://res.cloudinary.com/practicaldev/image/fetch/s--pcSkTMZL--/c_limit,f_auto,fl_progressive,q_80,w_190/https://practicaldev-herokuapp-com.freetls.fastly.net/assets/devlogo-pwa-512.png',
-      link: 'https://dev.to/'
-    },
+    // {
+    //   id: new Date().toISOString(),
+    //   title: 'Exercism',
+    //   image: 'https://github.com/exercism.png',
+    //   link: 'https://exercism.io/'
+    // },
+    // {
+    //   id: new Date().toISOString(),
+    //   title: 'Dev.to',
+    //   image: 'https://res.cloudinary.com/practicaldev/image/fetch/s--pcSkTMZL--/c_limit,f_auto,fl_progressive,q_80,w_190/https://practicaldev-herokuapp-com.freetls.fastly.net/assets/devlogo-pwa-512.png',
+    //   link: 'https://dev.to/'
+    // },
 
 ])
   const githubUser = 'AlNuN'
@@ -54,17 +54,29 @@ export default function Home() {
     const dadosForm = new FormData(event.target)
 
     const comunidade = {
-      id: new Date().toISOString(),
       title: dadosForm.get('title'),
-      image: dadosForm.get('image'),
+      imageUrl: dadosForm.get('image'),
       link: dadosForm.get('link'),
+      creatorSlug: githubUser,
     }
 
-    setComunidades([...comunidades, comunidade])
+    fetch('/api/comunidades', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(comunidade),
+    })
+    .then(async (response) => {
+      const dados = await response.json()
+      console.log(dados)
+      setComunidades([...comunidades, dados])
+    })
   }
 
   const [seguidores, setSeguidores] = useState([])
   useEffect(() => {
+    // Seguindo
     fetch(`https://api.github.com/users/${githubUser}/following`)
       .then((response) => {
         if(response.ok) {
@@ -74,6 +86,34 @@ export default function Home() {
       })
       .then((resp) => { setSeguidores(resp) })
       .catch((error) => console.log(error))
+  }, [])
+
+  useEffect(() => {
+    // API GraphQL
+    fetch(
+      'https://graphql.datocms.com/', 
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': '055637138a7350deb86fc175aae036', 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          "query": `query { 
+            allCommunities {
+              id
+              title
+              imageUrl
+              link
+              creatorSlug
+            }
+          }`
+        }),
+      }
+    )
+    .then((response) => response.json())
+    .then((res) => setComunidades(res.data.allCommunities))
   }, [])
 
   return (

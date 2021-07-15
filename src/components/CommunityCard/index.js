@@ -47,7 +47,7 @@ class ComunidadesDTO extends CommunityAbstract {
   constructor(item) {
     super(item)
   }
-  get image () { return this.item.image }
+  get image () { return this.item.imageUrl }
   get link () { return this.item.link }
   get name () { return this.item.title }
   get key () { return this.item.id }

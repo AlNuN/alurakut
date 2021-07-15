@@ -13,3 +13,5 @@ You'll need to have NodeJs installed in your machine.
 `npm run build` -> builds a bundle to deploy the application on a server
 
 `npm start` -> runs the application in production mode. It requires to be built previously
+
+You'll need to setup a environment variable with your DATOCMS full acess token named: `DATO_FULL_ACCESS_TOKEN`
