@@ -3,6 +3,8 @@ import Box from '../src/components/Box'
 import { CommunityCard, ComunidadesDTO, PessoasComunidadeDTO, SeguindoDTO } from '../src/components/CommunityCard'
 import { AlurakutMenu, AlurakutProfileSidebarMenuDefault, OrkutNostalgicIconSet } from '../src/lib/AlurakutCommons' 
 import { useEffect, useState } from 'react'
+import nookies from 'nookies'
+import jwt from 'jsonwebtoken'
 
 function ProfileSideBar(propriedades) {
   return (
@@ -22,23 +24,9 @@ function ProfileSideBar(propriedades) {
   )
 }
 
-export default function Home() {
-  const [comunidades, setComunidades] = useState([
-    // {
-    //   id: new Date().toISOString(),
-    //   title: 'Exercism',
-    //   image: 'https://github.com/exercism.png',
-    //   link: 'https://exercism.io/'
-    // },
-    // {
-    //   id: new Date().toISOString(),
-    //   title: 'Dev.to',
-    //   image: 'https://res.cloudinary.com/practicaldev/image/fetch/s--pcSkTMZL--/c_limit,f_auto,fl_progressive,q_80,w_190/https://practicaldev-herokuapp-com.freetls.fastly.net/assets/devlogo-pwa-512.png',
-    //   link: 'https://dev.to/'
-    // },
-
-])
-  const githubUser = 'AlNuN'
+export default function Home(props) {
+  const [comunidades, setComunidades] = useState([])
+  const githubUser = props.githubUser
   const pessoasFavoritas = [
     'JulianaAmoasei',
     'flaviohenriquealmeida',
@@ -188,4 +176,27 @@ export default function Home() {
       </MainGrid>
     </>
   )
+}
+
+export async function getServerSideProps(context) {
+  const cookies = nookies.get(context)
+  const token = cookies.USER_TOKEN
+  const { githubUser } = jwt.decode(token);
+  const { message } = await fetch(`https://api.github.com/users/${githubUser}`)
+  .then((resp) => resp.json())
+
+  if(message) {
+    return {
+      redirect: {
+        destination: '/login',
+        permanent: false,
+      }
+    }
+  }
+
+  return {
+    props: {
+      githubUser
+    }, 
+  }
 }
